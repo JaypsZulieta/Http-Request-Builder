@@ -1,6 +1,7 @@
 import { HttpRequestBuilder } from "./http-request-builder";
-
-export type GlobalThis = typeof globalThis;
+export interface CanFetch {
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+}
 
 export class FetchRequestBuilder implements HttpRequestBuilder {
   private headers: Headers;
@@ -8,7 +9,7 @@ export class FetchRequestBuilder implements HttpRequestBuilder {
   private bodySet?: BodyInit;
   private methodSet?: string;
 
-  constructor(private globalThis: GlobalThis) {
+  constructor(private fetcher: CanFetch) {
     this.headers = new Headers();
   }
 
@@ -35,6 +36,6 @@ export class FetchRequestBuilder implements HttpRequestBuilder {
     const body = this.bodySet;
     const headers = this.headers;
     const method = this.methodSet;
-    return this.globalThis.fetch(url, { body, headers, method });
+    return this.fetcher.fetch(url, { body, headers, method });
   }
 }
